@@ -1,0 +1,11 @@
+
+.heroimage{
+    width: 80%;
+    height: 25%; 
+    margin-left: 21%;
+}
+
+.container{
+    align-items: center;
+    text-align: center;
+}
