@@ -19,14 +19,14 @@ import AddProduct from './pages/admin/page/AddProduct';
 import UpdateProduct from './pages/admin/page/UpdateProduct';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Allproducts from './pages/allproducts/Allproducts';
+import Allposts from './pages/allposts/Allposts';
 function App() {
   return (
     <MyState>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/allproducts" element={<Allproducts />} />
+          <Route path="/allposts" element={<Allposts />} />
           <Route path="/order" element={
             <ProtectedRoute>
               <Order />

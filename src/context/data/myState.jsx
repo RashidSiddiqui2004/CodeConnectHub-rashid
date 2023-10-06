@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import MyContext from './myContext'
-import { Timestamp, addDoc, collection, deleteDoc, doc, getDocs, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, deleteDoc, serverTimestamp, doc, getDocs, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { fireDB } from '../../fireabase/FirebaseConfig';
+import { auth } from '../../fireabase/FirebaseConfig';
+import { where } from 'firebase/firestore';
 
 function myState(props) {
     const [mode, setMode] = useState('light');
@@ -23,13 +25,15 @@ function myState(props) {
     const [posts, setPosts] = useState({
         title: null,
         description: null,
+        author: null,
         language: null,
-        code:null,
+        code: null,
         imageUrl: null,
-        tags: null, 
+        tags: null,
         likes: 0,
         dislikes: 0,
         time: Timestamp.now(),
+        comments: [],
         date: new Date().toLocaleString(
             "en-US",
             {
@@ -42,7 +46,7 @@ function myState(props) {
 
     const addPost = async () => {
 
-        console.log(posts);
+        // console.log(posts);
         if (posts.title == null || posts.imageUrl == null || posts.tags == null || posts.description == null) {
             return toast.error("All fields are required")
         }
@@ -51,6 +55,7 @@ function myState(props) {
 
         try {
             const productRef = collection(fireDB, 'posts');
+            posts.author = auth.currentUser.uid;
             await addDoc(productRef, posts)
             toast.success("Added post successfully");
             setTimeout(() => {
@@ -138,6 +143,112 @@ function myState(props) {
         }
     }
 
+    const [mail, setEmail] = useState("");
+
+    const getUserEmail = async (authorID) => {
+        // console.log(authorID);
+
+        const usersCollection = collection(fireDB, 'users');
+
+        const userQuery = query(usersCollection, where('uid', '==', authorID));
+  
+        getDocs(userQuery)
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) { 
+                    const userDocument = querySnapshot.docs[0].data();
+                    let userEmail = userDocument.email; 
+                    setEmail(userEmail);
+                    // console.log(userEmail);
+                    return userEmail;
+                } else {
+                    console.log('No user found with the specified UID.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error retrieving user email:', error);
+            });
+ 
+    }
+
+    async function getCommentsForPost(postId) {
+        const commentsRef = collection(fireDB, 'comments'); // Reference to the comments collection
+    
+        // Create a query to filter comments by postId
+        const commentsQuery = query(commentsRef, where('post_id', '==', postId));
+        
+        // Execute the query and get the documents
+        const querySnapshot = await getDocs(commentsQuery);
+        
+        // Extract the comment data from the query snapshot
+        const comments = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+    
+        return comments;
+    }
+
+    async function writeComment(post_id, user_id, comment) {
+        const commentsRef = collection(fireDB, 'comments'); // Reference to the comments collection
+        
+        // Create a new comment document
+        const newComment = {
+            post_id,
+            user_id,
+            comment,
+            timestamp: new Date(), // You can include a timestamp for sorting
+        };
+        
+        // Add the comment to the collection
+        await setDoc(doc(commentsRef), newComment);
+    }
+
+    // function addCommentToPost(postId, commentContent) {
+    //     const commentsRef = collection(fireDB, 'posts', postId, 'comments'); // 'comments' is the subcollection
+    //     const newCommentDoc = {
+    //         commentContent,
+    //         timestamp: serverTimestamp(),
+    //     };
+
+    //     addDoc(commentsRef, newCommentDoc)
+    //         .then(() => {
+    //             console.log('Comment added successfully.');
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error adding comment:', error);
+    //         });
+    // }
+
+    // function getCommentsForPost(postId) {
+    //     const commentsRef = collection(fireDB, 'posts', postId, 'comments');
+
+    //     const comments = [];
+
+    //     getDocs(commentsRef)
+    //         .then((querySnapshot) => {
+    //             querySnapshot.forEach((doc) => {
+    //                 comments.push({ id: doc.id, ...doc.data() });
+    //             });
+    //             // console.log('Comments retrieved successfully:', comments);
+    //             return comments;
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error retrieving comments:', error);
+    //         });
+    // }
+
+    // Usage example
+    const postId = 'TC9D6n2GmR9v52sh9tZT'; // Replace with the actual post ID
+    // const userId = auth.currentUser.uid // Replace with the user's ID
+    // const userName = 'user_name'; // Replace with the user's name
+    // add name later
+    const commentContent = 'This is a great post!'; // Replace with the comment content
+
+    // console.log("User ID: ",auth.currentUser.uid);
+    // addCommentToPost(postId,userId, commentContent);
+
+    // getCommentsForPost(postId);
+
     // const incrementVotes = async () => {
     //     setLoading(true);
     //     try {
@@ -145,22 +256,22 @@ function myState(props) {
     //       console.log("upvoting...");
     //       const updatedVotes = posts.likes + 1; // Increase by 1, you can adjust this value as needed
     //       console.log(updatedVotes);
-      
+
     //       // Update the votes count in the posts object
     //       const updatedPost = {
     //         ...posts,
     //         likes: updatedVotes,
     //       };
-      
+
     //       // Update the post in Firestore with the updated votes count
     //       await setDoc(doc(fireDB, 'posts', posts.id), updatedPost);
-      
+
     //       toast.success("Post Updated successfully");
-      
+
     //     //   setTimeout(() => {
     //     //     window.location.href = '/dashboard';
     //     //   }, 800);
-      
+
     //       // Refresh the post data
     //     //   getPostData();
     //       setLoading(false);
@@ -183,7 +294,7 @@ function myState(props) {
                 setLoading(false)
             });
             setOrder(ordersArray);
-            console.log(ordersArray)
+            // console.log(ordersArray)
             setLoading(false);
         } catch (error) {
             console.log(error)
@@ -203,7 +314,7 @@ function myState(props) {
                 setLoading(false)
             });
             setUser(usersArray);
-            console.log(usersArray)
+            // console.log(usersArray)
             setLoading(false);
         } catch (error) {
             console.log(error)
@@ -225,8 +336,8 @@ function myState(props) {
             mode, toggleMode, loading, setLoading,
             posts, setPosts, addPost, post,
             edithandle, updatePost, deletePost, order,
-            user, searchkey, setSearchkey,filterType,setFilterType,
-            filterPrice,setFilterPrice
+            user, searchkey, setSearchkey, filterType, setFilterType,
+            filterPrice, setFilterPrice, writeComment, getCommentsForPost, getUserEmail, mail
         }}>
             {props.children}
         </MyContext.Provider>

@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from 'react'
 import Filter from '../../components/filter/Filter'
-import ProductCard from '../../components/productCard/ProductCard'
+import PostCard from '../../components/postCard/PostCard'
 import Layout from '../../components/layout/Layout'
 import myContext from '../../context/data/myContext'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../redux/cartSlice'
 
-function Allproducts() {
+function Allposts() {
     const context = useContext(myContext)
     const { mode, post, searchkey, setSearchkey, filterType, setFilterType,
         filterPrice, setFilterPrice } = context
@@ -33,7 +33,7 @@ function Allproducts() {
             <section className="text-gray-600 body-font">
                 <div className="container px-5 py-8 md:py-16 mx-auto">
                     <div class="lg:w-1/2 w-full mb-6 lg:mb-10">
-                        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900" style={{ color: mode === 'dark' ? 'white' : '' }}>Our Latest Collection</h1>
+                        <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900" style={{ color: mode === 'dark' ? 'white' : '' }}>Latest Posts</h1>
                         <div class="h-1 w-20 bg-pink-600 rounded"></div>
                     </div>
 
@@ -66,6 +66,7 @@ function Allproducts() {
                                                         </div>
                                                     ))}
                                                 </div> */}
+
                                                 <div className=" flex justify-center">
                                                     <button type="button"
                                                         onClick={() => addCart(item)}
@@ -79,9 +80,6 @@ function Allproducts() {
                                 )
                             })}
 
-
-
-
                     </div>
 
                 </div>
@@ -90,4 +88,4 @@ function Allproducts() {
     )
 }
 
-export default Allproducts
+export default Allposts

@@ -3,26 +3,28 @@ import Layout from '../../components/layout/Layout'
 import myContext from '../../context/data/myContext';
 import { useParams } from 'react-router';
 import { useDispatch, useSelector } from 'react-redux';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDocs, getDoc, setDoc, deleteDoc, collection } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { addToCart } from '../../redux/cartSlice';
 import { fireDB } from '../../fireabase/FirebaseConfig';
-import { FaHeart, FaComment, FaShare, FaBookmark, FaEdit, FaTrash, FaUser, FaBell, FaPaperclip } from "react-icons/fa";
+import { FaHeart, FaComment, FaBookmark, FaEdit, FaTrash, FaUser } from "react-icons/fa";
+import CommentForm from '../commentform/CommentForm';
+// import { comment } from 'postcss';
+import { auth } from '../../fireabase/FirebaseConfig';
+import Comment from 'postcss/lib/comment';
 
 function ProductInfo() {
     const context = useContext(myContext);
-    const { loading, setLoading } = context;
+    const { loading, setLoading, writeComment, getCommentsForPost, getUserEmail, mail } = context;
 
     const [poststate, setPosts] = useState('')
     const params = useParams()
 
-    const getProductData = async () => {
+    const getPostData = async () => {
         setLoading(true)
         try {
             const productTemp = await getDoc(doc(fireDB, "posts", params.id))
-            // console.log(productTemp)
             setPosts(productTemp.data());
-            // console.log(productTemp.data())
             setLoading(false)
         } catch (error) {
             console.log(error)
@@ -31,44 +33,47 @@ function ProductInfo() {
     }
 
     useEffect(() => {
-        getProductData()
+        getPostData()
     }, [])
 
-    const incrementVotes = async (post) => {
-        setLoading(true);
-        try {
-            // Increment the votes count before updating the post 
-            console.log("post data:", post);
-            const updatedVotes = post.likes + 1; // Increment the votes
+    async function likePost() {
+        const userId = auth.currentUser.uid;
+        const postId = params.id;
+
+        const likeRef = doc(fireDB, 'likes', `${userId}_${postId}`);
+        const likeDoc = await getDoc(likeRef);
+
+        if (likeDoc.exists() === true) {
+            // The user has already liked the post, so "unlike" it
+            const updatedVotes = poststate.likes - 1; // Increment the likes
             const updatedPost = {
-                ...post,
+                ...poststate,
                 likes: updatedVotes,
             };
 
-            console.log(updatedVotes);
-
-            await setDoc(doc(fireDB, 'posts', post.id), updatedPost);
-
-            toast.success("Post Updated successfully");
-
-            //   setTimeout(() => {
-            //     window.location.href = '/dashboard';
-            //   }, 800);
-
-            // Refresh the post data
-            //   getPostData();
-            setLoading(false);
-        } catch (error) {
-            console.log(error);
-            setLoading(false);
+            setPosts(updatedPost);
+            toast.dark('Post Downvoted 👎');
+            await deleteDoc(likeRef);
+        } else {
+            // The user hasn't liked the post yet, so "like" it
+            const updatedVotes = poststate.likes + 1; // Increment the likes
+            const updatedPost = {
+                ...poststate,
+                likes: updatedVotes,
+            };
+            // Update the post in the database
+            await setDoc(doc(fireDB, 'posts', params.id), updatedPost);
+            setPosts(updatedPost);
+            toast.success('Post Upvoted 👍');
+            await setDoc(likeRef, { userId, postId });
         }
-    };
+    }
+
+
 
     const dispatch = useDispatch()
     const cartItems = useSelector((state) => state.cart)
-    // console.log(cartItems)
 
-    // add to cart
     const addCart = (post) => {
         dispatch(addToCart(poststate))
         toast.success('add to cart');
@@ -78,6 +83,66 @@ function ProductInfo() {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems])
 
+    const [comments, setComments] = useState([]);
+
+    useEffect(() => {
+        // Fetch and set comments when the component mounts
+    async function fetchComments() {
+        const cmts = await getCommentsForPost(params.id);
+        setComments(cmts);
+    }
+
+    console.log(comments); 
+
+    }, []);
+
+    // comments retrieval and showcasing
+
+    // const [comments, setComments] = useState([]);
+
+    // useEffect(() => {
+    //     // Function to retrieve comments for the post
+    //     const fetchComments = async () => {
+    //         try {
+    //             const commentsRef = collection(fireDB, 'posts', params.id, 'comments');
+    //             const querySnapshot = await getDocs(commentsRef);
+
+    //             const commentData = [];
+    //             querySnapshot.forEach((doc) => {
+    //                 commentData.push({ id: doc.id, ...doc.data() });
+    //             });
+
+    //             setComments(commentData);
+    //         } catch (error) {
+    //             console.error('Error fetching comments:', error);
+    //         }
+    //     };
+
+    //     // Call the fetchComments function
+    //     fetchComments();
+    // }, [params.id]); // Make sure to include postId in the dependencies array if it's used inside useEffect
+
+    // Create a query to find the document where 'uid' matches the target UID
+    // console.log(poststate.author);
+
+    let [email, setEmail] = useState("");
+
+    useEffect(() => {
+        const fetchUserEmail = async () => {
+            try {
+                const useremail = await getUserEmail(poststate.author);
+                setEmail(useremail);
+            } catch (error) {
+                // Handle any errors here
+                console.error('Error fetching user email:', error);
+            }
+        };
+
+        const timer = setTimeout(fetchUserEmail, 1000);
+
+        // Clean up the timer if the component unmounts
+        return () => clearTimeout(timer);
+    }, []);
 
     return (
         <Layout>
@@ -86,75 +151,20 @@ function ProductInfo() {
                     {poststate &&
                         <div className="lg:w-4/5 mx-auto flex flex-wrap">
                             <img
-                                alt="ecommerce"
+                                alt="postImage"
                                 className="lg:w-1/3 w-full lg:h-auto  object-cover object-center rounded"
                                 src={poststate.imageUrl}
                             />
                             <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
                                 {/* AUTHOR ABC */}
                                 <h2 className="text-sm title-font text-gray-500 tracking-widest">
-                                    Author: ABC
+                                    Author: {email ? email : "Rashid"}
                                 </h2>
                                 <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">
                                     {poststate.title}
                                 </h1>
                                 <div className="flex mb-4">
                                     <span className="flex items-center">
-                                        {/* <svg
-                                        fill="currentColor"
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        className="w-4 h-4 text-indigo-500"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
-                                    <svg
-                                        fill="currentColor"
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        className="w-4 h-4 text-indigo-500"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
-                                    <svg
-                                        fill="currentColor"
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        className="w-4 h-4 text-indigo-500"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg>
-                                    <svg
-                                        fill="currentColor"
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        className="w-4 h-4 text-indigo-500"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg> 
-                                    <svg
-                                        fill="none"
-                                        stroke="currentColor"
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={2}
-                                        className="w-4 h-4 text-indigo-500"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                                    </svg> */}
 
                                         <span className="text-gray-600 ml-[150px]">{poststate.likes ? poststate.likes : 0} Upvotes</span>
                                         {/* replace with number of upvotes */}
@@ -212,8 +222,8 @@ function ProductInfo() {
                                 </p>
 
                                 <div className="flex">
-                                    <button onClick={() => incrementVotes(poststate)} className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
-                                        Upvote
+                                    <button onClick={() => likePost()} className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+                                        Upvote Now
                                     </button>
 
                                     <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
@@ -239,7 +249,17 @@ function ProductInfo() {
                                 </div>
 
                                 <div className='my-4'>
-                                    <p className='text-blue-700 underline'>COMMENT SECTION</p>
+                                    <p className='text-2xl font-semibold text-blue-700 underline mb-4 my-1'>COMMENT SECTION</p>
+                                </div>
+
+                                <CommentForm post_id={params.id} />
+
+                                <div>
+                                    {comments.map((comment) => (
+                                        
+                                        <h3 key={comment.user_id}>{comment}</h3> 
+                                        // <Comment key={comment.id} comment={comment} />
+                                    ))}
                                 </div>
 
                             </div>
