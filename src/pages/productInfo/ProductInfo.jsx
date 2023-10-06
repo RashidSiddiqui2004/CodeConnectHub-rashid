@@ -12,6 +12,7 @@ import CommentForm from '../commentform/CommentForm';
 // import { comment } from 'postcss';
 import { auth } from '../../fireabase/FirebaseConfig';
 import Comment from 'postcss/lib/comment';
+import CommentSection from '../commentform/CommentSection';
 
 function ProductInfo() {
     const context = useContext(myContext);
@@ -87,43 +88,14 @@ function ProductInfo() {
 
     useEffect(() => {
         // Fetch and set comments when the component mounts
-    async function fetchComments() {
-        const cmts = await getCommentsForPost(params.id);
-        setComments(cmts);
-    }
+        async function fetchComments() {
+            const cmts = await getCommentsForPost(params.id);
+            setComments(cmts);
+        }
 
-    console.log(comments); 
+        console.log(comments);
 
     }, []);
-
-    // comments retrieval and showcasing
-
-    // const [comments, setComments] = useState([]);
-
-    // useEffect(() => {
-    //     // Function to retrieve comments for the post
-    //     const fetchComments = async () => {
-    //         try {
-    //             const commentsRef = collection(fireDB, 'posts', params.id, 'comments');
-    //             const querySnapshot = await getDocs(commentsRef);
-
-    //             const commentData = [];
-    //             querySnapshot.forEach((doc) => {
-    //                 commentData.push({ id: doc.id, ...doc.data() });
-    //             });
-
-    //             setComments(commentData);
-    //         } catch (error) {
-    //             console.error('Error fetching comments:', error);
-    //         }
-    //     };
-
-    //     // Call the fetchComments function
-    //     fetchComments();
-    // }, [params.id]); // Make sure to include postId in the dependencies array if it's used inside useEffect
-
-    // Create a query to find the document where 'uid' matches the target UID
-    // console.log(poststate.author);
 
     let [email, setEmail] = useState("");
 
@@ -240,30 +212,25 @@ function ProductInfo() {
                                     </button>
                                 </div>
 
-                                <div className='flex flex-row'>
-                                    <button className=" text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
+                                <div className="flex flex-row items-center my-10 w-[300px] mx-[20%]">
+                                    <button className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded-l-lg focus:outline-none w-1/2">
                                         Start a Thread
                                     </button>
-
-                                    <FaComment className="icon my-3 w-[40px] mx-3" />
+                                    <div className="bg-indigo-500 text-white py-2 px-4 rounded-r-lg w-1/2 flex items-center justify-center">
+                                        <FaComment className="text-2xl" />
+                                    </div>
                                 </div>
 
-                                <div className='my-4'>
+                                {/* <div className='my-4'>
                                     <p className='text-2xl font-semibold text-blue-700 underline mb-4 my-1'>COMMENT SECTION</p>
-                                </div>
+                                </div> */}
 
                                 <CommentForm post_id={params.id} />
 
-                                <div>
-                                    {comments.map((comment) => (
-                                        
-                                        <h3 key={comment.user_id}>{comment}</h3> 
-                                        // <Comment key={comment.id} comment={comment} />
-                                    ))}
-                                </div>
-
                             </div>
                         </div>}
+
+                    <CommentSection postId={params.id} />
                 </div>
             </section>
 
