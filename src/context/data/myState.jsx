@@ -1,9 +1,10 @@
-import React, { useEffect, useId, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MyContext from './myContext'
-import { Timestamp, addDoc, collection, deleteDoc, serverTimestamp, doc, getDocs, onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
+import { Timestamp, addDoc, collection, deleteDoc, doc, getDocs,
+     onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { fireDB } from '../../fireabase/FirebaseConfig';
-import { auth } from '../../fireabase/FirebaseConfig';
+// import { auth } from '../../fireabase/FirebaseConfig';
 import { where } from 'firebase/firestore';
 
 function myState(props) {
@@ -23,10 +24,10 @@ function myState(props) {
     const [loading, setLoading] = useState(false);
 
     const [posts, setPosts] = useState({
-        title: null,
-        description: null,
+        title: "",
+        description: "",
         author: null,
-        language: null,
+        language: "",
         code: null,
         imageUrl: null,
         tags: null,
@@ -46,8 +47,8 @@ function myState(props) {
 
     const addPost = async () => {
 
-        // console.log(posts);
-        if (posts.title == null || posts.imageUrl == null || posts.tags == null || posts.description == null) {
+        console.log(posts);
+        if (posts.title == null || posts.tags == null || posts.description == null) {
             return toast.error("All fields are required")
         }
 
@@ -66,8 +67,7 @@ function myState(props) {
         } catch (error) {
             console.log(error);
             setLoading(false)
-        }
-        // setProducts("")
+        } 
     }
 
     const [post, setPost] = useState([]);
@@ -204,6 +204,79 @@ function myState(props) {
         await setDoc(doc(commentsRef), newComment);
     }
 
+    // challenges
+
+    const [challenges, setChallenges] = useState({
+        title: null,
+        problemStatement: null,
+        author: null,   
+        tags: null,
+        submissions: 0,
+        time: Timestamp.now()
+    });
+
+    const addChallenge = async () => {
+
+        if (challenges.title == null) {
+            return toast.error("Title is required..")
+        }
+
+        if( challenges.problemStatement == null){
+            return toast.error("Challenge is required..");
+        }
+
+        setLoading(true)
+
+        try {
+            const challengeRef = collection(fireDB, 'challenges'); 
+            await addDoc(challengeRef, challenges)
+            toast.success("Added Challenge Successfully");
+            setTimeout(() => {
+                window.location.href = '/challenges'
+            }, 800);
+            getChallengeData();
+            setLoading(false)
+        } catch (error) {
+            console.log(error);
+            setLoading(false)
+        } 
+    }
+
+    const [challenge, setChallenge] = useState([]);
+
+    const getChallengeData = async () => {
+
+        setLoading(true)
+
+        try {
+            const q = query(
+                collection(fireDB, 'challenges'),
+                orderBy('time')
+            );
+
+            const data = onSnapshot(q, (QuerySnapshot) => {
+                let chlgArray = [];
+                QuerySnapshot.forEach((doc) => {
+                    chlgArray.push({ ...doc.data(), id: doc.id });
+                });
+                setChallenge(chlgArray);
+                setLoading(false);
+            });
+
+            return () => data;
+
+        } catch (error) {
+            console.log(error)
+            setLoading(false)
+        }
+
+    }
+
+    useEffect(() => {
+        getChallengeData();
+    }, []);
+
+
     // orders -> remove
 
     const [order, setOrder] = useState([]);
@@ -261,7 +334,8 @@ function myState(props) {
             posts, setPosts, addPost, post,
             edithandle, updatePost, deletePost, order,
             user, searchkey, setSearchkey, filterType, setFilterType,
-            filterPrice, setFilterPrice, writeComment, getCommentsForPost, getUserEmail, mail
+            filterPrice, setFilterPrice, writeComment, getCommentsForPost, getUserEmail, mail,
+            challenges, setChallenges, addChallenge, challenge, setChallenge
         }}>
             {props.children}
         </MyContext.Provider>

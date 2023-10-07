@@ -2,7 +2,9 @@
 .heroimage{
     width: 80%;
     height: 25%; 
-    margin-left: 21%;
+    margin-left: 17%;
+    margin-top: 2%;
+    border-radius: 10px;
 }
 
 .container{

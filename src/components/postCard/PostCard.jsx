@@ -22,6 +22,7 @@ function PostCard() {
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems])
+    
     return (
         <section className="text-gray-600 body-font">
             <div className="container px-5 py-8 md:py-16 mx-auto">
@@ -49,8 +50,7 @@ function PostCard() {
                                             {/* <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>E-Bharat</h2> */}
                                             <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>{title}</h1>
                                             <p className="leading-relaxed mb-3">{description}</p>
-                                            {/* <p className="leading-relaxed mb-3" style={{ color: mode === 'dark' ? 'white' : '' }}>{tags}</p> */}
-
+      
                                             <div className="flex flex-wrap gap-2 my-2">
                                                 {tagList.map((tag, index) => (
                                                     <div

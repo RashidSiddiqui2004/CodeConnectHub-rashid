@@ -6,9 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import Home from './pages/home/Home';
-import Order from './pages/order/Order';
-import Cart from './pages/cart/Cart';
+import Home from './pages/home/Home';  
 import Dashboard from './pages/admin/dashboard/Dashboard';
 import NoPage from './pages/nopage/NoPage';
 import MyState from './context/data/myState';
@@ -20,6 +18,9 @@ import UpdateProduct from './pages/admin/page/UpdateProduct';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Allposts from './pages/allposts/Allposts';
+import Challenge from './pages/challenges/Challenge';
+import AddChallenge from './pages/challenges/SubmitChlg';
+import ChallengeInfo from './pages/challenges/ChallengeInfo';
 function App() {
   return (
     <MyState>
@@ -27,12 +28,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/allposts" element={<Allposts />} />
-          <Route path="/order" element={
-            <ProtectedRoute>
-              <Order />
-            </ProtectedRoute>
-          } />
-          <Route path="/cart" element={<Cart />} />
+          {/* <Route path="/order" element={ */}
+            {/* <ProtectedRoute> */}
+              <Route path="/challenges" element={<Challenge />} />
+            {/* </ProtectedRoute>
+           } /> */} 
           <Route path="/dashboard" element={
             <ProtectedRouteForAdmin>
               <Dashboard />
@@ -41,6 +41,13 @@ function App() {
           <Route path='/login' element={<Login/>} />
           <Route path='/signup' element={<Signup/>} />
           <Route path='/productinfo/:id' element={<ProductInfo/>} />
+
+          <Route path='/challengeInfo/:id' element={<ChallengeInfo/>} />
+
+          <Route path='/submitChallenge' element={ 
+              <AddChallenge/> 
+          } />
+
           <Route path='/addproduct' element={ 
               <AddPost/> 
           } />

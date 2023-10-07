@@ -1,29 +1,28 @@
+
 import React, { useContext, useEffect, useState } from 'react'
 import Layout from '../../components/layout/Layout'
 import myContext from '../../context/data/myContext';
-import { useParams } from 'react-router';
-import { useDispatch, useSelector } from 'react-redux';
-import { doc, getDocs, getDoc, setDoc, deleteDoc} from 'firebase/firestore';
+import { useParams } from 'react-router'; 
+import { doc, getDocs, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 import { addToCart } from '../../redux/cartSlice';
 import { fireDB } from '../../fireabase/FirebaseConfig';
-import { FaHeart, FaComment, FaBookmark, FaEdit, FaTrash } from "react-icons/fa";
 import CommentForm from '../commentform/CommentForm';
-import { auth } from '../../fireabase/FirebaseConfig'; 
+import { auth } from '../../fireabase/FirebaseConfig';
 import CommentSection from '../commentform/CommentSection';
 
-function ProductInfo() {
+function ChallengeInfo() {
     const context = useContext(myContext);
     const { loading, setLoading, writeComment, getCommentsForPost, getUserEmail, mail } = context;
 
-    const [poststate, setPosts] = useState('')
+    const [challenge, setChallenge] = useState('')
     const params = useParams()
 
-    const getPostData = async () => {
+    const getChallengeData = async () => {
         setLoading(true)
         try {
-            const productTemp = await getDoc(doc(fireDB, "posts", params.id))
-            setPosts(productTemp.data());
+            const productTemp = await getDoc(doc(fireDB, "challenges", params.id))
+            setChallenge(productTemp.data());
             setLoading(false)
         } catch (error) {
             console.log(error)
@@ -32,116 +31,40 @@ function ProductInfo() {
     }
 
     useEffect(() => {
-        getPostData()
+        getChallengeData()
     }, [])
 
-    async function likePost() {
-        const userId = auth.currentUser.uid;
-        const postId = params.id;
+    let taglist;
 
-        const likeRef = doc(fireDB, 'likes', `${userId}_${postId}`);
-        const likeDoc = await getDoc(likeRef);
-
-        if (likeDoc.exists() === true) {
-            // The user has already liked the post, so "unlike" it
-            const updatedVotes = poststate.likes - 1; // Increment the likes
-            const updatedPost = {
-                ...poststate,
-                likes: updatedVotes,
-            };
-
-            setPosts(updatedPost);
-            toast.dark('Post Downvoted 👎');
-            await deleteDoc(likeRef);
-        } else {
-            // The user hasn't liked the post yet, so "like" it
-            const updatedVotes = poststate.likes + 1; // Increment the likes
-            const updatedPost = {
-                ...poststate,
-                likes: updatedVotes,
-            };
-            // Update the post in the database
-            await setDoc(doc(fireDB, 'posts', params.id), updatedPost);
-            setPosts(updatedPost);
-            toast.success('Post Upvoted 👍');
-            await setDoc(likeRef, { userId, postId });
-        }
-    }
-
-
-
-    const dispatch = useDispatch()
-    const cartItems = useSelector((state) => state.cart)
-
-    const addCart = (post) => {
-        dispatch(addToCart(poststate))
-        toast.success('add to cart');
-    }
-
-    useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-    }, [cartItems])
-
-    const [comments, setComments] = useState([]);
-
-    useEffect(() => {
-        // Fetch and set comments when the component mounts
-        async function fetchComments() {
-            const cmts = await getCommentsForPost(params.id);
-            setComments(cmts);
-        }
-
-        console.log(comments);
-
-    }, []);
-
-    let [email, setEmail] = useState("");
-
-    useEffect(() => {
-        const fetchUserEmail = async () => {
-            try {
-                const useremail = await getUserEmail(poststate.author);
-                setEmail(useremail);
-            } catch (error) {
-                // Handle any errors here
-                console.error('Error fetching user email:', error);
-            }
-        };
-
-        const timer = setTimeout(fetchUserEmail, 1000);
-
-        // Clean up the timer if the component unmounts
-        return () => clearTimeout(timer);
-    }, []);
+    setTimeout(() => {
+        taglist = challenge.tags.split(", ");
+    }, 300);
 
     return (
         <Layout>
             <section className="text-gray-600 body-font overflow-hidden">
                 <div className="container px-5 py-10 mx-auto">
-                    {poststate &&
+                    {challenge &&
                         <div className="lg:w-4/5 mx-auto flex flex-wrap">
-                            <img
+
+                            {/* <img
                                 alt="postImage"
                                 className="w-1/2 md:w-2/3 lg:w-2/3 h-auto max-h-[400px] mx-[17%] object-cover object-center rounded"
                                 src={poststate.imageUrl}
-                            />
-                            {/* <img
-                                alt="postImage"
-                                className="lg:w-1/3 w-[400px] lg:h-[400px] fit-content object-cover object-center rounded"
-                                src={poststate.imageUrl}
-                            /> */}
+                            />  */}
+
                             <div className="lg:w-2/3 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0 mx-[17%]">
-                                {/* AUTHOR ABC */}
+
                                 <h2 className="text-sm title-font text-gray-500 tracking-widest">
-                                    Author: {poststate.author ? poststate.author : "Rashid"}
+                                    Author: {challenge.author ? challenge.author : "Rashid"}
                                 </h2>
                                 <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">
-                                    {poststate.title}
+                                    {challenge.title}
                                 </h1>
                                 <div className="flex mb-4">
                                     <span className="flex items-center">
 
-                                        <span className="text-gray-600 ml-[150px]">{poststate.likes ? poststate.likes : 0} Upvotes</span>
+                                        <span className="text-gray-600 ml-[150px]">{challenge.submissions ? poststate.submissions : 0} Submissions</span>
 
                                     </span>
                                     <span className="flex ml-3 pl-3 py-2 border-l-2 border-gray-200 space-x-2s">
@@ -183,19 +106,27 @@ function ProductInfo() {
                                         </a>
                                     </span>
                                 </div>
-                                <p className="leading-relaxed border-b-2 mb-5 pb-5">
-                                    {poststate.description}
+
+                                <div className="flex flex-wrap items-center justify-center my-4 mx-auto p-4 max-w-2xl bg-red-300 text-blue-800 rounded-lg shadow-md">
+                                    <span className="font-bold text-lg mr-2">Tags:  {challenge.tags}</span>
+                                    {/* {taglist &&
+                                        taglist.map((tag, index) => (
+                                            <div
+                                                key={index}
+                                                className="bg-blue-500 text-white rounded-full py-1 px-3 text-sm m-1"
+                                            >
+                                                {tag}
+                                            </div>
+                                        ))} */}
+                                </div>
+
+                                <h2 className='underline cursor-pointer py-2'>Problem Statement</h2>
+
+                                <p className="leading-relaxed border-b-2 mb-5 pb-5 text-lg text-slate-800">
+                                    {challenge.problemStatement}
                                 </p>
 
-                                <p className="leading-relaxed border-b-2 mb-5 pb-5 text-red-500">
-                                    {poststate.language}
-                                </p>
-
-                                <p className="leading-relaxed border-b-2 mb-5 pb-5">
-                                    {poststate.code}
-                                </p>
-
-                                <div className="flex">
+                                {/* <div className="flex">
                                     <button onClick={() => likePost()} className="flex ml-auto text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded">
                                         Upvote Now
                                     </button>
@@ -212,27 +143,20 @@ function ProductInfo() {
                                             <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
                                         </svg>
                                     </button>
-                                </div>
-
-                                <div className="flex flex-row items-center my-10 w-[300px] mx-[20%]">
-                                    <button className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded-l-lg focus:outline-none w-1/2">
-                                        Start a Thread
-                                    </button>
-                                    <div className="bg-indigo-500 text-white py-2 px-4 rounded-r-lg w-1/2 flex items-center justify-center">
-                                        <FaComment className="text-2xl" />
-                                    </div>
-                                </div>
-
-                                {/* <div className='my-4'>
-                                    <p className='text-2xl font-semibold text-blue-700 underline mb-4 my-1'>COMMENT SECTION</p>
                                 </div> */}
 
-                                <CommentForm post_id={params.id} />
+                                {/* <div className="flex flex-row items-center my-10 w-[300px] mx-[20%]">
+                                    <button className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-6 rounded-l-lg focus:outline-none w-1/2">
+                                        Start a Thread
+                                    </button> 
+                                </div>
+
+                                <CommentForm post_id={params.id} /> */}
 
                             </div>
                         </div>}
 
-                    <CommentSection postId={params.id} />
+                    {/* <CommentSection postId={params.id} /> */}
                 </div>
             </section>
 
@@ -240,4 +164,4 @@ function ProductInfo() {
     )
 }
 
-export default ProductInfo
+export default ChallengeInfo

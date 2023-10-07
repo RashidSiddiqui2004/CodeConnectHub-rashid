@@ -4,7 +4,7 @@ import "./styles.css"
 function HeroSection() {
   return (
     <div className='container'>
-      <img src="./heroImg.png" alt="" className='heroimage' />
+      <img src="/hero.jpg" alt="" className='heroimage' />
     </div>
   )
 }

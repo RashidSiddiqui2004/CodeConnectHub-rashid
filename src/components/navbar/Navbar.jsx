@@ -22,7 +22,7 @@ function Navbar() {
     window.location.href = '/login'
   }
 
-  const cartItems = useSelector((state) => state.cart)
+  // const cartItems = useSelector((state) => state.cart)
 
   return (
     <div className='bg-white sticky top-0 z-50'>
@@ -146,6 +146,11 @@ function Navbar() {
                   <Link to={'/allposts'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
                     All Posts
                   </Link>
+
+                  <Link to={'/challenges'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
+                    Challenges
+                  </Link>
+
 
                  {!user &&  (<Link to={'/signup'}  className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
                       Signup
