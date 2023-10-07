@@ -1,23 +1,100 @@
 import React, { useContext, useState } from 'react'
-import myContext from '../../../context/data/myContext'
-// import CodeEditor from './Codeeditor';
+import myContext from '../../../context/data/myContext' 
+import { auth } from '../../../fireabase/FirebaseConfig';
+import { fireDB } from '../../../fireabase/FirebaseConfig';
+import { collection, query, where, getDocs } from "firebase/firestore";
 import MonacoEditor from "react-monaco-editor";
 import "./styles.css"
 
-function AddProduct() {
+function AddPost() {
     const context = useContext(myContext);
     const { posts, setPosts, addPost } = context;
-    // const [code, setCode] = useState(""); // Store code content here
-    const [language, setLanguage] = useState("javascript"); // Default language
+    const [language, setLanguage] = useState("javascript");
 
     const handleCodeChange = (newCode) => {
-        setCode(newCode);
+        setPosts({ ...posts, code: newCode });
+        // setCode(newCode.target.value);
     };
 
 
     const handleLanguageChange = (e) => {
         setLanguage(e.target.value);
     };
+
+    // to get the username
+    async function getUsernameByUID(uid) {
+        // Reference to the "users" collection
+        const usersCollection = collection(fireDB, 'users');
+
+        // Create a query to find the user with the specified UID
+        const userQuery = query(usersCollection, where('uid', '==', uid));
+
+        try {
+            const querySnapshot = await getDocs(userQuery);
+
+            if (!querySnapshot.empty) {
+                // Retrieve the first (and hopefully only) document
+                const userDoc = querySnapshot.docs[0];
+                // Extract the username (name) field
+                const username = userDoc.data().name;
+                console.log('Username:', username);
+
+                return username;
+            } else {
+                console.log('User not found.');
+            }
+        } catch (error) {
+            console.error('Error fetching user:', error);
+        }
+
+        return null;
+
+    }
+
+    // useEffect(() => {
+    //     const fetchUsername = async () => {
+    //         try {
+    //             const user = auth.currentUser;
+    //             if (user) {
+    //                 const username = await getUsernameByUID(user.uid);
+    //                 if (username) {
+    //                     setUser(username);
+    //                     setPosts({ ...posts, author: username });
+    //                 } else {
+    //                     console.log('User not found.');
+    //                 }
+    //             } else {
+    //                 console.log('User is not logged in.');
+    //             }
+    //         } catch (error) {
+    //             console.error('Error fetching user:', error);
+    //         }
+    //     };
+
+    //     fetchUsername();
+    // }, []);
+
+    let uid;
+
+    try {
+        uid = auth.currentUser.uid;
+    } catch (err) {
+        console.error("error", err);
+    }
+
+
+    const [u_name, setUser] = useState('');
+
+    getUsernameByUID(uid).then((username) => {
+        if (username) {
+            console.log(`Username for UID ${uid}: ${username}`);
+            posts
+            setUser(username);
+            posts.author = u_name;
+        } else {
+            console.log(`User with UID ${uid} not found.`);
+        }
+    });
 
     return (
         <div>
@@ -54,7 +131,8 @@ function AddProduct() {
                         <select
                             id="language"
                             value={posts.language}
-                            onChange={(e) => setPosts({ ...posts, language: e.target.value })}
+                            onChange={handleLanguageChange}
+                            // onChange={(e) => setPosts({ ...posts, language: e.target.value })}
                             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-500"
                         >
                             <option value="javascript">JavaScript</option>
@@ -70,19 +148,19 @@ function AddProduct() {
                     <div>
                         <label htmlFor="code" className="block font-semibold mb-2 text-white">
                             Code:
-                        </label>
+                        </label> 
+
                         <MonacoEditor
                             height="300"
                             language={language}
                             theme="vs-light"
-                            // value={code}
-                            // onChange={handleCodeChange}
-                            value={posts.code}
-                            onChange={(e) => setPosts({ ...posts, code: e.target.value })}
+                            value={posts.code} 
+                            onChange={handleCodeChange} // Use the updated 'handleCodeChange' function
                             options={{
                                 wordWrap: "on",
                             }}
                         />
+
                     </div>
 
                     <div>
@@ -118,4 +196,4 @@ function AddProduct() {
     )
 }
 
-export default AddProduct
+export default AddPost

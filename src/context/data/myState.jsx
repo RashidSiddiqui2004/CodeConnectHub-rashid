@@ -55,11 +55,11 @@ function myState(props) {
 
         try {
             const productRef = collection(fireDB, 'posts');
-            posts.author = auth.currentUser.uid;
+            // posts.author = auth.currentUser.name;
             await addDoc(productRef, posts)
             toast.success("Added post successfully");
             setTimeout(() => {
-                window.location.href = '/dashboard'
+                window.location.href = '/'
             }, 800);
             getPostData();
             setLoading(false)

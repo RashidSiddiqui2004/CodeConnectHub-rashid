@@ -9,8 +9,7 @@ const CommentForm = ({ post_id }) => {
   const [comment, setComment] = useState('');
 
   const context = useContext(myContext);
-  const { writeComment } = context;
-  const user_id = auth.currentUser.uid;
+  const { writeComment } = context; 
 
   async function getUsernameByUID(uid) { 
       // Reference to the "users" collection
@@ -26,8 +25,7 @@ const CommentForm = ({ post_id }) => {
             // Retrieve the first (and hopefully only) document
             const userDoc = querySnapshot.docs[0];
             // Extract the username (name) field
-            const username = userDoc.data().name;
-            console.log('Username:', username);
+            const username = userDoc.data().name; 
            
             return username;       
           } else {
@@ -47,7 +45,7 @@ const CommentForm = ({ post_id }) => {
  
   getUsernameByUID(uid).then((username) => {
     if (username) {
-      console.log(`Username for UID ${uid}: ${username}`);
+      // console.log(`Username for UID ${uid}: ${username}`);
       setUser(username);
     } else {
       console.log(`User with UID ${uid} not found.`);
@@ -57,7 +55,7 @@ const CommentForm = ({ post_id }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (comment.trim() === '') return; // Prevent empty comments
-    writeComment(post_id, user_id, comment, u_name); 
+    writeComment(post_id, uid, comment, u_name); 
     setComment('');
   };
 

@@ -9,7 +9,6 @@ import { addToCart } from '../../redux/cartSlice';
 import { fireDB } from '../../fireabase/FirebaseConfig';
 import { FaHeart, FaComment, FaBookmark, FaEdit, FaTrash, FaUser } from "react-icons/fa";
 import CommentForm from '../commentform/CommentForm';
-// import { comment } from 'postcss';
 import { auth } from '../../fireabase/FirebaseConfig';
 import Comment from 'postcss/lib/comment';
 import CommentSection from '../commentform/CommentSection';
@@ -124,13 +123,18 @@ function ProductInfo() {
                         <div className="lg:w-4/5 mx-auto flex flex-wrap">
                             <img
                                 alt="postImage"
-                                className="lg:w-1/3 w-full lg:h-auto  object-cover object-center rounded"
+                                className="w-1/2 md:w-2/3 lg:w-2/3 h-auto max-h-[400px] mx-[17%] object-cover object-center rounded"
                                 src={poststate.imageUrl}
                             />
-                            <div className="lg:w-1/2 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
+                            {/* <img
+                                alt="postImage"
+                                className="lg:w-1/3 w-[400px] lg:h-[400px] fit-content object-cover object-center rounded"
+                                src={poststate.imageUrl}
+                            /> */}
+                            <div className="lg:w-2/3 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0 mx-[17%]">
                                 {/* AUTHOR ABC */}
                                 <h2 className="text-sm title-font text-gray-500 tracking-widest">
-                                    Author: {email ? email : "Rashid"}
+                                    Author: {poststate.author ? poststate.author : "Rashid"}
                                 </h2>
                                 <h1 className="text-gray-900 text-3xl title-font font-medium mb-1">
                                     {poststate.title}
@@ -139,7 +143,6 @@ function ProductInfo() {
                                     <span className="flex items-center">
 
                                         <span className="text-gray-600 ml-[150px]">{poststate.likes ? poststate.likes : 0} Upvotes</span>
-                                        {/* replace with number of upvotes */}
 
                                     </span>
                                     <span className="flex ml-3 pl-3 py-2 border-l-2 border-gray-200 space-x-2s">
@@ -185,7 +188,7 @@ function ProductInfo() {
                                     {poststate.description}
                                 </p>
 
-                                <p className="leading-relaxed border-b-2 mb-5 pb-5">
+                                <p className="leading-relaxed border-b-2 mb-5 pb-5 text-red-500">
                                     {poststate.language}
                                 </p>
 
@@ -198,7 +201,7 @@ function ProductInfo() {
                                         Upvote Now
                                     </button>
 
-                                    <button className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
+                                    <button onClick={() => likePost()} className="rounded-full w-10 h-10 bg-gray-200 p-0 border-0 inline-flex items-center justify-center text-gray-500 ml-4">
                                         <svg
                                             fill="currentColor"
                                             strokeLinecap="round"
