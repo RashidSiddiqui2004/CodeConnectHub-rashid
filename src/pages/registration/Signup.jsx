@@ -24,7 +24,7 @@ function Signup() {
             const result = await signInWithEmailAndPassword(auth,email,password);
             toast.success("Login successful", {
                 position: "top-right",
-                autoClose: 2000,
+                autoClose: 1800,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
@@ -38,16 +38,6 @@ function Signup() {
             
         } catch (error) {
             console.log(error)
-            toast.info("Password should consist of atleast 6 chars",{
-                position: "top-right",
-                autoClose: 2000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "colored",
-              });
             setLoading(loading)
         }
 
@@ -79,6 +69,16 @@ function Signup() {
             
         } catch (error) {
             console.log(error)
+            toast.info("Password should consist of atleast 6 chars",{
+                position: "top-right",
+                autoClose: 1800,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+              });
             setLoading(false)
         }
     }

@@ -1,35 +1,16 @@
 import React, { useContext, useEffect } from 'react'
-import Filter from '../../components/filter/Filter'
-import PostCard from '../../components/postCard/PostCard'
+import Filter from '../../components/filter/Filter' 
 import Layout from '../../components/layout/Layout'
-import myContext from '../../context/data/myContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { addToCart } from '../../redux/cartSlice'
+import myContext from '../../context/data/myContext' 
 
 function Allposts() {
     const context = useContext(myContext)
-    const { mode, post, searchkey, setSearchkey, filterType, setFilterType,
-        filterPrice, setFilterPrice } = context
+    const { mode, post, searchkey, setSearchkey, filterType} = context
 
-    const dispatch = useDispatch()
-    const cartItems = useSelector((state) => state.cart);
-    console.log(cartItems)
-
-    const addCart = (product) => {
-        dispatch(addToCart(product));
-        toast.success('add to cart');
-    }
-
-    useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-    }, [cartItems])
-    useEffect(() => {
-        window.scrollTo(0, 0)
-    }, [])
 
     return (
         <Layout>
-            <Filter />
+            {/* <Filter /> */}
             <section className="text-gray-600 body-font">
                 <div className="container px-5 py-8 md:py-16 mx-auto">
                     <div className="lg:w-1/2 w-full mb-6 lg:mb-10">
@@ -52,7 +33,7 @@ function Allposts() {
                                             
                                                 <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>{title}</h1>
 
-                                                <p className="leading-relaxed mb-3">{description}</p>
+                                                <p className="leading-relaxed mb-3">{description.slice(0, 150)}...</p>
 
                                                 <div className="flex flex-wrap gap-2 my-2">
                                                     {tagList.map((tag, index) => (
@@ -65,12 +46,7 @@ function Allposts() {
                                                     ))}
                                                 </div>
 
-                                                <div className=" flex justify-center">
-                                                    <button type="button"
-                                                        onClick={() => addCart(item)}
-                                                        className="focus:outline-none text-white bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full  py-2">Add To Cart</button>
-
-                                                </div>
+                                           
                                             </div>
 
                                         </div>

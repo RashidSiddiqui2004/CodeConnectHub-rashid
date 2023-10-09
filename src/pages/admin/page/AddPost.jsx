@@ -92,8 +92,7 @@ function AddPost() {
                          
                          <input type="text"
                             value={posts.title}
-                            onChange={handleTitle}
-                            // onChange={(e) => setPosts({ ...posts, title: e.target.value })}
+                            onChange={handleTitle} 
                             name='title'
                             className=' bg-gray-600 mb-4 px-2 py-2  inputbox rounded-lg text-white placeholder:text-gray-200 outline-none'
                             placeholder='Add Post Title'
@@ -103,8 +102,7 @@ function AddPost() {
 
                         <textarea cols="40" rows="10" name='description'
                             value={posts.description}
-                            onChange={handleDesc}
-                            // onChange={(e) => setPosts({ ...posts, description: e.target.value })} 
+                            onChange={handleDesc} 
                             className=' bg-gray-600 mb-4 px-2 py-2 w-full inputbox  rounded-lg text-white placeholder:text-gray-200 outline-none'
                             placeholder='POST description..'>
                         </textarea>
@@ -114,7 +112,7 @@ function AddPost() {
 
                     <div className="mb-4">
                         <label htmlFor="language" className="block font-semibold mb-2 text-white">
-                            Select Language:
+                            Select Language:  (*Optional)
                         </label>
                         <select
                             id="language"
@@ -135,7 +133,7 @@ function AddPost() {
 
                     <div>
                         <label htmlFor="code" className="block font-semibold mb-2 text-white">
-                            Code:
+                            Code: (*Optional)
                         </label> 
 
                         <MonacoEditor
@@ -166,7 +164,7 @@ function AddPost() {
                             onChange={(e) => setPosts({ ...posts, tags: e.target.value })}
                             name='tags'
                             className=' bg-gray-600 mb-4 px-2 py-2 w-full   rounded-lg inputbox text-white placeholder:text-gray-200 outline-none'
-                            placeholder='Add Tags'
+                            placeholder='Add Tags (Separated by commas without #)'
                         />
                     </div>
 

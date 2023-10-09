@@ -27,12 +27,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/allposts" element={<Allposts />} />
-          {/* <Route path="/order" element={ */}
+          <Route path="/allposts" element={<Allposts />} /> 
             {/* <ProtectedRoute> */}
               <Route path="/challenges" element={<Challenge />} />
-            {/* </ProtectedRoute>
-           } /> */} 
+            {/* </ProtectedRoute>  */} 
           <Route path="/dashboard" element={
             <ProtectedRouteForAdmin>
               <Dashboard />

@@ -18,20 +18,23 @@ function Home() {
 
   return (
     <Layout>
-      <HeroSection />
-      <Filter />
+      <HeroSection /> 
 
-      <div className="width-[900px] my-[20px]">
+      <div className="w-96 mx-auto my-20">
         <button
           onClick={add}
           type="button"
-          className="focus:outline-none bg-green-500 shadow-[inset_0_0_10px_rgba(0,0,0,0.6)] 
-          border hover:bg-blue-500 outline-0 font-medium rounded-lg text-lg px-5 py-2.5 mb-2 my-7 mx-[480px] w-[600px] text-center"
-          style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} > <div className="flex gap-2 items-center">
-            <h2 className='mx-[230px] text-[20px] h-9 my-1 text-white hover:text-red-200'>Add Post </h2>
-          </div></button>
+          className={`focus:outline-none ${mode === 'dark'
+              ? 'bg-gray-800 text-white hover:bg-blue-500'
+              : 'bg-green-500 hover:bg-blue-500'
+            } shadow-md border border-transparent rounded-lg text-lg px-5 
+    py-2 mb-2 my-0 w-full transition-transform transform hover:scale-105`}
+        >
+          <div className="flex items-center justify-center">
+            <h2 className="mr-2 text-white">Add Post</h2>
+          </div>
+        </button>
       </div>
-
       <PostCard />
       <div className="flex justify-center -mt-10 mb-4">
         <Link to={'/allposts'}>

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import MyContext from './myContext'
-import { Timestamp, addDoc, collection, deleteDoc, doc, getDocs,
-     onSnapshot, orderBy, query, setDoc } from 'firebase/firestore';
+import {
+    Timestamp, addDoc, collection, deleteDoc, doc, getDocs,
+    onSnapshot, orderBy, query, setDoc, getDoc, updateDoc
+} from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import { fireDB } from '../../fireabase/FirebaseConfig';
-// import { auth } from '../../fireabase/FirebaseConfig';
+import { fireDB } from '../../fireabase/FirebaseConfig'; 
 import { where } from 'firebase/firestore';
 
 function myState(props) {
@@ -67,7 +68,7 @@ function myState(props) {
         } catch (error) {
             console.log(error);
             setLoading(false)
-        } 
+        }
     }
 
     const [post, setPost] = useState([]);
@@ -79,7 +80,7 @@ function myState(props) {
         try {
             const q = query(
                 collection(fireDB, 'posts'),
-                orderBy('time')
+                orderBy('time', 'desc')
             );
 
             const data = onSnapshot(q, (QuerySnapshot) => {
@@ -151,12 +152,12 @@ function myState(props) {
         const usersCollection = collection(fireDB, 'users');
 
         const userQuery = query(usersCollection, where('uid', '==', authorID));
-  
+
         getDocs(userQuery)
             .then((querySnapshot) => {
-                if (!querySnapshot.empty) { 
+                if (!querySnapshot.empty) {
                     const userDocument = querySnapshot.docs[0].data();
-                    let userEmail = userDocument.email; 
+                    let userEmail = userDocument.email;
                     setEmail(userEmail);
                     // console.log(userEmail);
                     return userEmail;
@@ -167,39 +168,47 @@ function myState(props) {
             .catch((error) => {
                 console.error('Error retrieving user email:', error);
             });
- 
+
     }
 
     async function getCommentsForPost(postId) {
         const commentsRef = collection(fireDB, 'comments'); // Reference to the comments collection
-    
+
         // Create a query to filter comments by postId
         const commentsQuery = query(commentsRef, where('post_id', '==', postId));
-        
+
         // Execute the query and get the documents
         const querySnapshot = await getDocs(commentsQuery);
-        
+
         // Extract the comment data from the query snapshot
         const comments = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
         }));
-    
+
         return comments;
     }
 
     async function writeComment(post_id, user_id, comment, username) {
         const commentsRef = collection(fireDB, 'comments'); // Reference to the comments collection
-        
+
         // Create a new comment document
         const newComment = {
             post_id,
             user_id,
             comment,
             username,
-            timestamp: new Date(), // You can include a timestamp for sorting
+            timestamp: new Date(),  
+            date: new Date().toLocaleString(
+                "en-US",
+                {
+                    month: "short",
+                    day: "2-digit",
+                    year: "numeric",
+                }
+            )
         };
-        
+
         // Add the comment to the collection
         await setDoc(doc(commentsRef), newComment);
     }
@@ -209,7 +218,7 @@ function myState(props) {
     const [challenges, setChallenges] = useState({
         title: null,
         problemStatement: null,
-        author: null,   
+        author: null,
         tags: null,
         submissions: 0,
         time: Timestamp.now()
@@ -221,14 +230,14 @@ function myState(props) {
             return toast.error("Title is required..")
         }
 
-        if( challenges.problemStatement == null){
+        if (challenges.problemStatement == null) {
             return toast.error("Challenge is required..");
         }
 
         setLoading(true)
 
         try {
-            const challengeRef = collection(fireDB, 'challenges'); 
+            const challengeRef = collection(fireDB, 'challenges');
             await addDoc(challengeRef, challenges)
             toast.success("Added Challenge Successfully");
             setTimeout(() => {
@@ -239,7 +248,7 @@ function myState(props) {
         } catch (error) {
             console.log(error);
             setLoading(false)
-        } 
+        }
     }
 
     const [challenge, setChallenge] = useState([]);
@@ -277,24 +286,58 @@ function myState(props) {
     }, []);
 
 
-    // orders -> remove
+    // submissions
 
-    const [order, setOrder] = useState([]);
+    const [submission, setSubmission] = useState({
+        problem_id: null,
+        approach: null,
+        solution: null,
+        author: null,
+        time: Timestamp.now()
+    });
 
-    const getOrderData = async () => {
+    const sendSubmission = async () => {
+
+        if (submission.problem_id == null) {
+            return toast.error("Author is required..")
+        }
+
+        if (submission.approach == null) {
+            return toast.error("Approach is required..");
+        }
+
         setLoading(true)
+
         try {
-            const result = await getDocs(collection(fireDB, "order"))
-            const ordersArray = [];
-            result.forEach((doc) => {
-                ordersArray.push(doc.data());
-                setLoading(false)
-            });
-            setOrder(ordersArray);
-            // console.log(ordersArray)
-            setLoading(false);
+            const submsRef = collection(fireDB, 'submissions');
+            await addDoc(submsRef, submission)
+            
+            // update the submission count for challenge
+
+            // Fetch the challenge document
+            const challengeDocRef = doc(fireDB, "challenges", submission.problem_id);
+            const challengeDocSnapshot = await getDoc(challengeDocRef);
+
+            if (challengeDocSnapshot.exists()) {
+                const currentSubmissionCount = challengeDocSnapshot.data().submissions || 0;
+
+                // Increment the submission count by 1
+                const newSubmissionCount = currentSubmissionCount + 1;
+
+                // Update the challenge's submission count in the database
+                await updateDoc(challengeDocRef, {
+                    submissions: newSubmissionCount,
+                });
+            }
+
+            toast.success("Submitted Successfully");
+            setTimeout(() => {
+                window.location.href = '/challenges'
+            }, 800);
+
+            setLoading(false)
         } catch (error) {
-            console.log(error)
+            console.log(error);
             setLoading(false)
         }
     }
@@ -319,8 +362,7 @@ function myState(props) {
         }
     }
 
-    useEffect(() => {
-        getOrderData();
+    useEffect(() => { 
         getUserData();
     }, []);
 
@@ -332,10 +374,11 @@ function myState(props) {
         <MyContext.Provider value={{
             mode, toggleMode, loading, setLoading,
             posts, setPosts, addPost, post,
-            edithandle, updatePost, deletePost, order,
+            edithandle, updatePost, deletePost,
             user, searchkey, setSearchkey, filterType, setFilterType,
             filterPrice, setFilterPrice, writeComment, getCommentsForPost, getUserEmail, mail,
-            challenges, setChallenges, addChallenge, challenge, setChallenge
+            challenges, setChallenges, addChallenge, challenge, setChallenge,
+            submission, setSubmission, sendSubmission
         }}>
             {props.children}
         </MyContext.Provider>

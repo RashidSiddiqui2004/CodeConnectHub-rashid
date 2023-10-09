@@ -9,20 +9,16 @@ import { useSelector } from 'react-redux';
 
 function Navbar() {
   const context = useContext(myContext);
-  const {mode, toggleMode} = context;
+  const { mode, toggleMode } = context;
 
   const [open, setOpen] = useState(false)
 
   const user = JSON.parse(localStorage.getItem('user'));
 
-  // console.log(user.user.email)
-
   const logout = () => {
     localStorage.clear('user');
     window.location.href = '/login'
-  }
-
-  // const cartItems = useSelector((state) => state.cart)
+  } 
 
   return (
     <div className='bg-white sticky top-0 z-50'>
@@ -62,14 +58,14 @@ function Navbar() {
                   </button>
                 </div>
                 <div className="space-y-6 border-t border-gray-200 px-4 py-6">
-                  
+
                   <Link to={'/allposts'} className="text-sm font-medium text-gray-900 " style={{ color: mode === 'dark' ? 'white' : '', }}>
                     Posts
                   </Link>
 
                   {user ? <div className="flow-root">
-                    <Link to={'/order'} style={{ color: mode === 'dark' ? 'white' : '', }} className="-m-2 block p-2 font-medium text-gray-900">
-                      Order
+                    <Link to={'/challenges'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
+                      Challenges
                     </Link>
                   </div> : ""}
 
@@ -79,12 +75,12 @@ function Navbar() {
                     </Link>
                   </div> : ""}
 
-                {user ? <div className="flow-root">
+                  {user ? <div className="flow-root">
                     <a onClick={logout} className="-m-2 block p-2 font-medium text-gray-900 cursor-pointer" style={{ color: mode === 'dark' ? 'white' : '', }}>
                       Logout
                     </a>
                   </div> : <div className="flow-root">
-                    <Link to={'/signup'}  className="-m-2 block p-2 font-medium text-gray-900 cursor-pointer" style={{ color: mode === 'dark' ? 'white' : '', }}>
+                    <Link to={'/signup'} className="-m-2 block p-2 font-medium text-gray-900 cursor-pointer" style={{ color: mode === 'dark' ? 'white' : '', }}>
                       Signup
                     </Link>
                   </div>}
@@ -97,17 +93,7 @@ function Navbar() {
                   </div>
                 </div>
 
-                <div className="border-t border-gray-200 px-4 py-6">
-                  <a href="#" className="-m-2 flex items-center p-2">
-                    <img
-                      src="img/indiaflag.png"
-                      alt=""
-                      className="block h-auto w-5 flex-shrink-0"
-                    />
-                    <span className="ml-3 block text-base font-medium text-gray-900" style={{ color: mode === 'dark' ? 'white' : '', }}>INDIA</span>
-                    <span className="sr-only">, change currency</span>
-                  </a>
-                </div>
+            
               </Dialog.Panel>
             </Transition.Child>
           </div>
@@ -115,7 +101,7 @@ function Navbar() {
       </Transition.Root>
 
       <header className="relative bg-white">
-        
+
         <nav aria-label="Top" className="bg-gray-100 px-4 sm:px-6 lg:px-8 shadow-xl " style={{ backgroundColor: mode === 'dark' ? '#282c34' : '', color: mode === 'dark' ? 'white' : '', }}>
           <div className="">
             <div className="flex h-16 items-center">
@@ -152,17 +138,17 @@ function Navbar() {
                   </Link>
 
 
-                 {!user &&  (<Link to={'/signup'}  className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
-                      Signup
-                    </Link>)}
+                  {!user && (<Link to={'/signup'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
+                    Signup
+                  </Link>)}
 
-                  {user?.user?.email === 'siddiqui20042007@gmail.com' ? 
-                   <Link to={'/dashboard'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
-                    Admin
-                  </Link> : ""}
-                  
-                
-                 {user ?  <a onClick={logout} className="text-sm font-medium text-gray-700 cursor-pointer  " style={{ color: mode === 'dark' ? 'white' : '', }}>
+                  {user?.user?.email === 'siddiqui20042007@gmail.com' ?
+                    <Link to={'/dashboard'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
+                      Admin
+                    </Link> : ""}
+
+
+                  {user ? <a onClick={logout} className="text-sm font-medium text-gray-700 cursor-pointer  " style={{ color: mode === 'dark' ? 'white' : '', }}>
                     Logout
                   </a> : ""}
                 </div>

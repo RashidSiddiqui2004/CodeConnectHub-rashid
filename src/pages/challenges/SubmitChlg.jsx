@@ -52,9 +52,10 @@ function AddChallenge() {
     getUsernameByUID(uid).then((username) => {
         if (username) {
             console.log(`Username for UID ${uid}: ${username}`);
-            posts
+            // posts
             setUser(username);
             challenges.author = u_name;
+            setChallenges({ ...challenges, author: username })
         } else {
             console.log(`User with UID ${uid} not found.`);
         }

@@ -1,28 +1,10 @@
 import React, { useContext, useEffect } from 'react'
-import myContext from '../../context/data/myContext'
-import { useDispatch, useSelector } from 'react-redux'
-import { addToCart } from '../../redux/cartSlice'
-import { toast } from 'react-toastify'
+import myContext from '../../context/data/myContext' 
 
 function PostCard() {
     const context = useContext(myContext)
-    const { mode, post, searchkey, setSearchkey, filterType, setFilterType,
-        filterPrice, setFilterPrice } = context
+    const { mode, post, searchkey, setSearchkey, filterType } = context
 
-    const dispatch = useDispatch()
-    const cartItems = useSelector((state) => state.cart);
-    // console.log(cartItems)
-
-    const addCart = (product) => {
-        dispatch(addToCart(product));
-        toast.success('add to cart');
-
-    }
-
-    useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-    }, [cartItems])
-    
     return (
         <section className="text-gray-600 body-font">
             <div className="container px-5 py-8 md:py-16 mx-auto">
@@ -47,10 +29,11 @@ function PostCard() {
                                             <img className=" rounded-2xl w-full h-80 p-2 hover:scale-110 transition-scale-110  duration-300 ease-in-out" src={imageUrl} alt="blog" />
                                         </div>
                                         <div className="p-5 border-t-2">
-                                            {/* <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1" style={{ color: mode === 'dark' ? 'white' : '', }}>E-Bharat</h2> */}
-                                            <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>{title}</h1>
-                                            <p className="leading-relaxed mb-3">{description}</p>
-      
+                                             <h1 className="title-font text-lg font-medium text-gray-900 mb-3" style={{ color: mode === 'dark' ? 'white' : '', }}>{title}</h1>
+                                         
+                                            <p className="leading-relaxed mb-3">{description.slice(0, 150)}...</p>
+
+
                                             <div className="flex flex-wrap gap-2 my-2">
                                                 {tagList.map((tag, index) => (
                                                     <div
@@ -62,12 +45,7 @@ function PostCard() {
                                                 ))}
                                             </div>
 
-                                            <div className=" flex justify-center">
-                                                <button type="button"
-                                                    onClick={() => addCart(item)}
-                                                    className="focus:outline-none text-white bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm w-full  py-2">Add To Cart</button>
-
-                                            </div>
+                                            
                                         </div>
 
                                     </div>
