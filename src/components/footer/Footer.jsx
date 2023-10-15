@@ -43,11 +43,7 @@ function CodingForumFooter() {
               Customer Service
             </h2>
             <nav className="list-none mb-10">
-              <li>
-                <Link to="/returnpolicy" className="hover:text-gray-800">
-                  Return Policy
-                </Link>
-              </li>
+              
               <li>
                 <Link to="/about" className="hover:text-gray-800">
                   About Us

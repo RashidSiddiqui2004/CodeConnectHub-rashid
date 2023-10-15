@@ -7,6 +7,11 @@ function Allposts() {
     const context = useContext(myContext)
     const { mode, post, searchkey, setSearchkey, filterType} = context
 
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    const login = () => {
+        window.location.href = '/login';
+    }
 
     return (
         <Layout>
@@ -17,6 +22,38 @@ function Allposts() {
                         <h1 className="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900" style={{ color: mode === 'dark' ? 'white' : '' }}>Latest Posts</h1>
                         <div className="h-1 w-20 bg-pink-600 rounded"></div>
                     </div>
+
+                    {user ? <div className="w-96 mx-auto my-20">
+        <button
+          onClick={add}
+          type="button"
+          className={`focus:outline-none ${mode === 'dark'
+            ? 'bg-gray-800 text-white hover:bg-blue-500'
+            : 'bg-green-500 hover:bg-blue-500'
+            } shadow-md border border-transparent rounded-lg text-lg px-5 
+    py-2 mb-2 my-0 w-full transition-transform transform hover:scale-105`}
+        >
+          <div className="flex items-center justify-center">
+            <h2 className="mr-2 text-white">Add Post</h2>
+          </div>
+        </button>
+      </div> : <div className="w-96 mx-auto my-20">
+
+        <button
+          onClick={login}
+          type="button"
+          className={`focus:outline-none ${mode === 'dark'
+            ? 'bg-gray-800 text-white hover:bg-blue-500'
+            : 'bg-green-500 hover:bg-blue-500'
+            } shadow-md border border-transparent rounded-lg text-lg px-5 
+    py-2 mb-2 my-0 w-full transition-transform transform hover:scale-105`}
+        >
+
+          <div className="flex items-center justify-center">
+            <h2 className="mr-2 text-white">Login/Signup To Access Amazing Features</h2>
+          </div>
+        </button>
+      </div>}
 
                     <div className="flex flex-wrap -m-4">
                         {post.filter((obj) => obj.title.toLowerCase().includes(searchkey))

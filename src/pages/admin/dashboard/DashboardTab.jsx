@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import myContext from '../../../context/data/myContext';
-import Layout from '../../../components/layout/Layout';
+import myContext from '../../../context/data/myContext'; 
 import { MdOutlineProductionQuantityLimits } from 'react-icons/md'
 import { FaUser, FaCartPlus } from 'react-icons/fa';
 import { AiFillShopping, AiFillPlusCircle, AiFillDelete } from 'react-icons/ai';
@@ -87,7 +86,7 @@ function DashboardTab() {
                                             </tr>
                                         </thead>
                                         {post.map((item, index) => {
-                                            const { title, imageUrl, description, date , tags} = item;
+                                            const { title, imageUrl, date , tags} = item;
                                             return (
                                                 <tbody className=''>
                                                     <tr className="bg-gray-50 border-b  dark:border-gray-700" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >

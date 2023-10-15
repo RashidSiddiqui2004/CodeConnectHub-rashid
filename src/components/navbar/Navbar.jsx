@@ -4,8 +4,7 @@ import { BsFillCloudSunFill } from 'react-icons/bs'
 import { FiSun } from 'react-icons/fi'
 import { Link } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react'
-import { RxCross2 } from 'react-icons/rx'
-import { useSelector } from 'react-redux';
+import { RxCross2 } from 'react-icons/rx' 
 
 function Navbar() {
   const context = useContext(myContext);
@@ -133,9 +132,15 @@ function Navbar() {
                     All Posts
                   </Link>
 
-                  <Link to={'/challenges'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
+                  {/* <Link to={'/challenges'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
                     Challenges
-                  </Link>
+                  </Link> */}
+
+                  {user ? <div className="flow-root">
+                    <Link to={'/challenges'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
+                      Challenges
+                    </Link>
+                  </div> : ""}
 
 
                   {!user && (<Link to={'/signup'} className="text-sm font-medium text-gray-700 " style={{ color: mode === 'dark' ? 'white' : '', }}>
