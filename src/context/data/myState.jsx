@@ -5,7 +5,7 @@ import {
     onSnapshot, orderBy, query, setDoc, getDoc, updateDoc
 } from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import { fireDB } from '../../fireabase/FirebaseConfig'; 
+import { fireDB } from '../../fireabase/FirebaseConfig';
 import { where } from 'firebase/firestore';
 
 function myState(props) {
@@ -28,6 +28,7 @@ function myState(props) {
         title: "",
         description: "",
         author: null,
+        authorId: "",
         language: "",
         code: null,
         imageUrl: null,
@@ -48,17 +49,17 @@ function myState(props) {
 
     const addPost = async () => {
 
-        console.log(posts);
         if (posts.title == null || posts.tags == null || posts.description == null) {
             return toast.error("All fields are required")
         }
 
+        console.log(posts);
+
         setLoading(true)
 
         try {
-            const productRef = collection(fireDB, 'posts');
-            // posts.author = auth.currentUser.name;
-            await addDoc(productRef, posts)
+            const postRef = collection(fireDB, 'posts');
+            await addDoc(postRef, posts)
             toast.success("Added post successfully");
             setTimeout(() => {
                 window.location.href = '/'
@@ -74,7 +75,6 @@ function myState(props) {
     const [post, setPost] = useState([]);
 
     const getPostData = async () => {
-
         setLoading(true)
 
         try {
@@ -105,11 +105,8 @@ function myState(props) {
         getPostData();
     }, []);
 
-    // update product function
 
-    const edithandle = (item) => {
-        setPosts(item)
-    }
+    // update product function
 
     const updatePost = async () => {
         setLoading(true)
@@ -118,7 +115,7 @@ function myState(props) {
             await setDoc(doc(fireDB, 'posts', posts.id), posts)
             toast.success("Post Updated successfully")
             setTimeout(() => {
-                window.location.href = '/dashboard'
+                window.history.back();
             }, 800);
             getPostData();
             setLoading(false)
@@ -147,7 +144,6 @@ function myState(props) {
     const [mail, setEmail] = useState("");
 
     const getUserEmail = async (authorID) => {
-        // console.log(authorID);
 
         const usersCollection = collection(fireDB, 'users');
 
@@ -171,6 +167,8 @@ function myState(props) {
 
     }
 
+    const [comments, setComments] = useState([]);
+
     async function getCommentsForPost(postId) {
         const commentsRef = collection(fireDB, 'comments'); // Reference to the comments collection
 
@@ -186,7 +184,8 @@ function myState(props) {
             ...doc.data(),
         }));
 
-        return comments;
+        setComments(comments);
+        return;
     }
 
     async function writeComment(post_id, user_id, comment, username) {
@@ -198,7 +197,8 @@ function myState(props) {
             user_id,
             comment,
             username,
-            timestamp: new Date(),  
+            // likes: 0,
+            timestamp: new Date(),
             date: new Date().toLocaleString(
                 "en-US",
                 {
@@ -209,8 +209,33 @@ function myState(props) {
             )
         };
 
-        // Add the comment to the collection
         await setDoc(doc(commentsRef), newComment);
+    }
+
+    // get replies for comment
+
+    const [replies, setReplies] = useState([]);
+
+    async function getReplies(commentId) {
+
+        const commentsColl = collection(fireDB, 'comments');
+
+        const userQuery = query(commentsColl, where('id', '==', commentId));
+
+        getDocs(userQuery)
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    const userDocument = querySnapshot.docs[0].data();
+                    let commentdata = userDocument;
+                    setReplies(commentdata);
+                    // console.log(commentReplies); 
+                } else {
+                    console.log('No reply found.');
+                }
+            })
+            .catch((error) => {
+                console.error('Error retrieving replies:', error);
+            });
     }
 
     // challenges
@@ -311,7 +336,7 @@ function myState(props) {
         try {
             const submsRef = collection(fireDB, 'submissions');
             await addDoc(submsRef, submission)
-            
+
             // update the submission count for challenge
 
             // Fetch the challenge document
@@ -362,7 +387,85 @@ function myState(props) {
         }
     }
 
-    useEffect(() => { 
+    // const submitReply = async (commentId) => {
+    //     // Create a Firestore reference to the post document using a collection group query
+    //     // const postRef = db.collectionGroup('comments').where('id', '==', commentId);
+
+    //     const commentsColl = collection(fireDB, 'comments');
+
+    //     const postRef = query(commentsColl, where('id', '==', commentId));
+    //     // Prepare the reply data
+    //     const replyData = {
+    //         userId: '12345', // Replace with the actual user ID
+    //         reply: "New reply",
+    //         timestamp: new Date()
+    //     };
+
+    //     const userQuery = query(commentsColl, where('id', '==', commentId));
+
+    //     let commentdata = "";
+
+    //     getDocs(userQuery)
+    //         .then((querySnapshot) => {
+    //             if (!querySnapshot.empty) {
+    //                 const userDocument = querySnapshot.docs[0].data();
+    //                 commentdata = userDocument; 
+    //             } else {
+    //                 console.log('No reply found.');
+    //             }
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error retrieving replies:', error);
+    //         });
+
+    //     // Use the `arrayUnion` method to append the reply to the 'replies' array
+    //     postRef.update({
+    //         replies:commentdata.replies.arrayUnion(replyData),
+    //     });
+
+    // }
+
+    const submitReply = async (commentId, userID, username, userReply) => {
+        // Create a Firestore reference to the post document using a collection group query
+        const commentsColl = collection(fireDB, 'comments');
+        const postRef = query(commentsColl, where('id', '==', commentId));
+         
+        // Prepare the reply data
+        const replyData = {
+            userId: userID, 
+            reply: userReply,
+            username: username,
+            timestamp: new Date()
+        };
+    
+        // Get the existing comment data, including the 'replies' array
+        try {
+            const userQuery = query(commentsColl, where('id', '==', commentId));
+            const querySnapshot = await getDocs(userQuery);
+    
+            if (!querySnapshot.empty) {
+                const userDocument = querySnapshot.docs[0].data();
+    
+                // Extract the existing 'replies' array
+                const existingReplies = userDocument.replies || [];
+    
+                // Use the `arrayUnion` method to append the reply to the 'replies' array
+                existingReplies.push(replyData);
+    
+                // Update the document with the new 'replies' array
+                await updateDoc(querySnapshot.docs[0].ref, {
+                    replies: existingReplies
+                });
+            } else {
+                console.log('No comment found.');
+            }
+        } catch (error) {
+            console.error('Error retrieving or updating replies:', error);
+        }
+    };
+    
+
+    useEffect(() => {
         getUserData();
     }, []);
 
@@ -374,11 +477,13 @@ function myState(props) {
         <MyContext.Provider value={{
             mode, toggleMode, loading, setLoading,
             posts, setPosts, addPost, post,
-            edithandle, updatePost, deletePost,
+           updatePost, deletePost,
             user, searchkey, setSearchkey, filterType, setFilterType,
-            filterPrice, setFilterPrice, writeComment, getCommentsForPost, getUserEmail, mail,
+            filterPrice, setFilterPrice, comments, setComments, writeComment,
+            getCommentsForPost, getUserEmail, mail,
             challenges, setChallenges, addChallenge, challenge, setChallenge,
-            submission, setSubmission, sendSubmission
+            submission, setSubmission, sendSubmission, getReplies,
+             replies, setReplies,submitReply
         }}>
             {props.children}
         </MyContext.Provider>

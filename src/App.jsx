@@ -21,6 +21,7 @@ import Allposts from './pages/allposts/Allposts';
 import Challenge from './pages/challenges/Challenge';
 import AddChallenge from './pages/challenges/SubmitChlg';
 import ChallengeInfo from './pages/challenges/ChallengeInfo';
+import CommentReply from './pages/commentform/CommentReply';
 function App() {
   return (
     <MyState>
@@ -40,6 +41,8 @@ function App() {
           <Route path='/signup' element={<Signup/>} />
           <Route path='/productinfo/:id' element={<ProductInfo/>} />
 
+          <Route path='productinfo/commentreplies/:id' element={<CommentReply/>} />
+
           <Route path='/challengeInfo/:id' element={<ChallengeInfo/>} />
 
           <Route path='/submitChallenge' element={ 
@@ -50,9 +53,7 @@ function App() {
               <AddPost/> 
           } />
           <Route path='/updateproduct' element={
-            <ProtectedRouteForAdmin>
-              <UpdateProduct/>
-            </ProtectedRouteForAdmin>
+              <UpdateProduct/> 
           } />
           <Route path="/*" element={<NoPage />} />
         </Routes>

@@ -22,10 +22,8 @@ const CommentForm = ({ post_id }) => {
     try {
       const querySnapshot = await getDocs(userQuery);
 
-      if (!querySnapshot.empty) {
-        // Retrieve the first (and hopefully only) document
-        const userDoc = querySnapshot.docs[0];
-        // Extract the username (name) field
+      if (!querySnapshot.empty) { 
+        const userDoc = querySnapshot.docs[0]; 
         const username = userDoc.data().name;
 
         return username;

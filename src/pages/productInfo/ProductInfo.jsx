@@ -11,11 +11,11 @@ import { FaComment, FaBookmark } from "react-icons/fa";
 import CommentForm from '../commentform/CommentForm';
 import { auth } from '../../fireabase/FirebaseConfig';
 import CommentSection from '../commentform/CommentSection';
-const user = JSON.parse(localStorage.getItem('user'));
+import { Link } from 'react-router-dom';
 
 function ProductInfo() {
   const context = useContext(myContext);
-  const { setLoading, getCommentsForPost, getUserEmail } = context;
+  const { setLoading, getCommentsForPost, getUserEmail, mode, deletePost, user } = context;
 
   const [poststate, setPosts] = useState('');
   const params = useParams();
@@ -36,7 +36,9 @@ function ProductInfo() {
     getPostData();
   }, []);
 
- 
+  const userID = JSON.parse(localStorage.getItem('user')).user.uid;
+
+
   async function likePost() {
     try {
       let userId;
@@ -79,7 +81,7 @@ function ProductInfo() {
           await setDoc(likeRef, { userId, postId });
         }
       } catch (error) {
-        console.error('Error while liking a post:', error); 
+        console.error('Error while liking a post:', error);
       }
     } catch (error) {
       toast.dark('Please log in/sign up to like posts.');
@@ -91,46 +93,33 @@ function ProductInfo() {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart);
 
-  const addCart = (post) => {
-    dispatch(addToCart(poststate));
-    toast.success('Added to cart');
-  }
-
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems));
-  }, [cartItems]);
-
   const [comments, setComments] = useState([]);
 
   useEffect(() => {
-    // Fetch and set comments when the component mounts
     async function fetchComments() {
       const cmts = await getCommentsForPost(params.id);
       setComments(cmts);
     }
 
-    console.log(comments);
-
   }, []);
 
-  let [email, setEmail] = useState("");
+  // let [email, setEmail] = useState("");
 
-  useEffect(() => {
-    const fetchUserEmail = async () => {
-      try {
-        const useremail = await getUserEmail(poststate.author);
-        setEmail(useremail);
-      } catch (error) {
-        // Handle any errors here
-        console.error('Error fetching user email:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchUserEmail = async () => {
+  //     try {
+  //       const useremail = await getUserEmail(poststate.author);
+  //       setEmail(useremail);
+  //     } catch (error) {
+  //       // Handle any errors here
+  //       console.error('Error fetching user email:', error);
+  //     }
+  //   };
 
-    const timer = setTimeout(fetchUserEmail, 1000);
-
-    // Clean up the timer if the component unmounts
-    return () => clearTimeout(timer);
-  }, []);
+  //   const timer = setTimeout(fetchUserEmail, 1000);
+  //   // Clean up the timer if the component unmounts
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   return (
     <Layout>
@@ -143,8 +132,8 @@ function ProductInfo() {
                 className="w-full md:w-2/3 lg:w-1/2 h-auto max-h-[400px] object-cover object-center rounded"
                 src={poststate.imageUrl}
               />
+
               <div className="lg:w-2/3 w-full lg:pl-10 lg:py-6 mt-6 lg:mt-0">
-                {/* AUTHOR ABC */}
                 <h2 className="text-sm title-font text-gray-500 tracking-widest">
                   Author: {poststate.author ? poststate.author : "Rashid"}
                 </h2>
@@ -195,7 +184,28 @@ function ProductInfo() {
                       </svg>
                     </a>
                   </span>
+
+                  {(poststate?.authorId && poststate.authorId == userID) ?
+                    <div className="mx-[300px] flex gap-2">
+                      <div className=" flex gap-2 cursor-pointer text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
+                        <div onClick={() => deletePost(poststate)}  >
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                          </svg>
+                        </div>
+
+                        <Link to={'/updateproduct'}>
+                          <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                          </div>
+                        </Link>
+                      </div>
+                    </div> : ""}
                 </div>
+
+
                 <p className="leading-relaxed border-b-2 mb-5 pb-5">
                   {poststate.description}
                 </p>
