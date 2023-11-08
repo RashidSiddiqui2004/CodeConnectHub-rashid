@@ -5,7 +5,7 @@ import {
     onSnapshot, orderBy, query, setDoc, getDoc, updateDoc
 } from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import { fireDB } from '../../fireabase/FirebaseConfig';
+import { fireDB } from '../../firebase/FirebaseConfig';
 import { where } from 'firebase/firestore';
 
 function myState(props) {
@@ -356,9 +356,9 @@ function myState(props) {
             }
 
             toast.success("Submitted Successfully");
-            setTimeout(() => {
-                window.location.href = '/challenges'
-            }, 800);
+            setTimeout(() => { 
+                window.location.reload();
+            }, 500);
 
             setLoading(false)
         } catch (error) {
@@ -463,8 +463,128 @@ function myState(props) {
             console.error('Error retrieving or updating replies:', error);
         }
     };
-    
 
+    const [profiles, setProfiles] = useState({
+        userid: "",        // Unique user ID, you can use Firebase Authentication UID
+        fullname: "",      // User's full name
+        DOB: null,         // Date of Birth (you can use Firebase Timestamp)
+        age: null,         // Calculated or updated age (can be derived from DOB)
+        email: "",          
+        phoneNo: null,     
+        imageUrl: null,    
+        // prefereces
+        favdestinations: [],
+        preferredActivities: [],  
+        country: "India",   
+        badge: "Beginner",
+        followers: 0,
+        followings: 0,
+        time: Timestamp.now() 
+    });
+
+    const updateProfile = async () => {
+
+        if (profiles.email == null || profiles.fullname == null || profiles.userid==null) {
+            return toast.error("All fields are required")
+        }
+
+        setLoading(true)
+
+        try {
+            const profileRef = collection(fireDB, 'profiles');
+            await addDoc(profileRef, profiles)
+            toast.success("Updated profile successfully");
+            setTimeout(() => {
+                window.location.href = '/userprofile'
+            }, 800); 
+            setLoading(false)
+        } catch (error) {
+            console.log(error);
+            setLoading(false)
+        }
+    }
+
+    const addProfile = async () => {
+        if(profiles.email!=null && profiles.fullname!=null){
+            const profRef = collection(fireDB,'profiles');
+            await addDoc(profRef,profiles);
+            toast.success("Updated profile siuccessfully!");
+            setTimeout(() => {
+                window.location.href = "/userprofile";
+            }, 800);
+            setLoading(false)
+        }
+        else{
+            console.log("User email is not specified");
+        }
+    }
+
+    const updateProfileAuto = async () => {
+
+        if (profiles.email == null || profiles.fullname == null || profiles.userid==null) {
+            return toast.error("All fields are required")
+        }
+
+        setLoading(true)
+
+        try {
+            const profileRef = collection(fireDB, 'profiles');
+            await addDoc(profileRef, profiles)
+            toast.success("Updated profile successfully"); 
+            setLoading(false)
+        } catch (error) {
+            console.log(error);
+            setLoading(false)
+        }
+    }
+
+
+    const asliUpdateProfile = async () => {
+        setLoading(true);
+
+        try {
+            const profileRef = doc(fireDB, 'profiles', [profiles.curr_id]);
+            await updateDoc(profileRef, profiles); 
+
+            toast.success("Profile updated successfully");
+            setTimeout(() => {
+                window.location.href = '/userprofile';
+            }, 800);
+            setLoading(false);
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+        
+    };
+
+    const [userProfile, setUserprofile] = useState([]);
+
+    const getProfileData = async (userid) => {
+        setLoading(true);
+
+        try {
+            const q = query(
+                collection(fireDB, 'profiles'),
+                where('userid', '==', userid)   
+            );
+
+            const data = onSnapshot(q, (querySnapshot) => {
+                let profileData = [];
+                querySnapshot.forEach((doc) => {
+                    profileData.push({ ...doc.data(), id: doc.id });
+                });
+                setUserprofile(profileData);
+                setLoading(false);
+            });
+
+            return () => data;
+        } catch (error) {
+            console.log(error);
+            setLoading(false);
+        }
+    }
+ 
     useEffect(() => {
         getUserData();
     }, []);
@@ -477,13 +597,15 @@ function myState(props) {
         <MyContext.Provider value={{
             mode, toggleMode, loading, setLoading,
             posts, setPosts, addPost, post,
-           updatePost, deletePost,
-            user, searchkey, setSearchkey, filterType, setFilterType,
+            updatePost, deletePost,  user, profiles, setProfiles, updateProfile, asliUpdateProfile,
+            userProfile, setUserprofile,addProfile, 
+            updateProfileAuto,  getProfileData,  searchkey,
+            setSearchkey, filterType, setFilterType,
             filterPrice, setFilterPrice, comments, setComments, writeComment,
             getCommentsForPost, getUserEmail, mail,
             challenges, setChallenges, addChallenge, challenge, setChallenge,
             submission, setSubmission, sendSubmission, getReplies,
-             replies, setReplies,submitReply
+            replies, setReplies,submitReply
         }}>
             {props.children}
         </MyContext.Provider>

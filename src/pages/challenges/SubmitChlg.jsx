@@ -1,8 +1,8 @@
 
 import React, { useContext, useState } from 'react'
 import myContext from '../../context/data/myContext' 
-import { auth } from '../../fireabase/FirebaseConfig';
-import { fireDB } from '../../fireabase/FirebaseConfig';
+import { auth } from '../../firebase/FirebaseConfig';
+import { fireDB } from '../../firebase/FirebaseConfig';
 import { collection, query, where, getDocs } from "firebase/firestore";  
 
 function AddChallenge() {

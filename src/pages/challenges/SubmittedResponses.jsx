@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { fireDB } from '../../fireabase/FirebaseConfig';
+import { fireDB } from '../../firebase/FirebaseConfig';
 
 function SubmissitedResponses({ problemId }) {
   const [responses, setResponses] = useState([]);
@@ -28,8 +28,8 @@ function SubmissitedResponses({ problemId }) {
   }, [problemId]);
 
   return (
-    <div className="my-6 w-[600px] mx-[25%]">
-      <h2 className="text-2xl font-semibold text-blue-700 underline mb-4">Past Submissions</h2>
+    <div className="my-6">
+      <h2 className="text-xl font-semibold text-green-400 underline mb-4">Most Upvoted Submissions</h2>
       <div className="space-y-6">
         {responses.map((response) => (
           <div key={response.id} className="bg-white p-6 rounded-lg shadow-md">
@@ -64,7 +64,7 @@ export default SubmissitedResponses;
 
 // import { useEffect, useState } from 'react';
 // import { collection, query, where, getDocs } from 'firebase/firestore';
-// import { fireDB } from '../../fireabase/FirebaseConfig';// Replace with your Firebase configuration
+// import { fireDB } from '../../firebase/FirebaseConfig';// Replace with your Firebase configuration
 
 // function SubmissitedResponses({ problemId }) {
 //   const [responses, setResponses] = useState([]);

@@ -10,7 +10,7 @@ import {
     collection, getDocs,
     query,
 } from 'firebase/firestore';
-import { fireDB } from '../../../fireabase/FirebaseConfig';
+import { fireDB } from '../../../firebase/FirebaseConfig';
 
 
 

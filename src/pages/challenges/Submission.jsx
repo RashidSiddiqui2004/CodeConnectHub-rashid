@@ -1,9 +1,9 @@
  
 import React, { useState, useContext, useEffect } from 'react';
 import myContext from '../../context/data/myContext';
-import { auth } from '../../fireabase/FirebaseConfig';
+import { auth } from '../../firebase/FirebaseConfig';
 import { getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { fireDB } from '../../fireabase/FirebaseConfig'; 
+import { fireDB } from '../../firebase/FirebaseConfig'; 
 import { useParams } from 'react-router';
 
 function Submission() { 
@@ -11,6 +11,7 @@ function Submission() {
   
     const context = useContext(myContext);
     const { submission, setSubmission, sendSubmission } = context;
+
     // to get the username
     async function getUsernameByUID(uid) {
       // Reference to the "users" collection
@@ -41,8 +42,7 @@ function Submission() {
     }
 
     const params = useParams()
- 
- 
+
     submission.problem_id = params.id;
 
     let uid;
@@ -56,39 +56,25 @@ function Submission() {
     const [u_name, setUser] = useState('');
 
     getUsernameByUID(uid).then((username) => {
-        if (username) {
-            // console.log(`Username for UID ${uid}: ${username}`); 
+        if (username) { 
             setUser(username);
             submission.author = u_name;
             setSubmission({ ...submission, author: username })
         } else {
-            console.log(`User with UID ${uid} not found.`);
+            return;
         }
     });
-  
-  
-  
-    //   const userid = auth.currentUser ? auth.currentUser.uid : '';
-  
-    // const handleSubmit = (e) => {
-    //   e.preventDefault();
-    //   if (submission.trim() === '') return;
-    //   sendSubmission(problem_id, approach, solution);
-    //   // sendSubmission(problem_id, userid, approach, u_name, solution);
-    //   setSubmission('');
-    //   toast.success('Submitted successfully!');
-    //   // setTimeout(() => {
-    //   //   window.location.reload();
-    //   // }, 2000);
-    // };
-  
+
+    const submitResponse = () => {
+      sendSubmission();
+    }
   
     return ( 
       <div className='w-full'>
-        <div className='flex justify-center items-center postbg py-8 w-full'>
+        <div className='flex justify-center bg-blue-200 items-center postbg py-5 w-full rounded-lg'>
           <div className=' bg-gray-800 px-10 py-10 rounded-xl postform'>
             <div>
-              <h2 className="text-2xl font-semibold mb-4 text-gray-800">Submit Challenge Response</h2>
+              <h2 className="text-xl font-semibold mb-4 text-center text-white">Submit Challenge Response</h2>
             </div>
             <div className=''>
               <textarea 
@@ -98,7 +84,7 @@ function Submission() {
                 className=' bg-gray-600 mb-4 px-2 py-2  inputbox rounded-lg
                  text-white placeholder:text-gray-200 outline-none'
                 rows="8"
-                placeholder='Add Challenge Approach'>
+                placeholder='Add Challenge Approach..'>
                 </textarea> 
             </div>
             <div>
@@ -129,7 +115,7 @@ function Submission() {
             <div className="text-center">
               <button
                 type="submit"
-                onClick={sendSubmission}
+                onClick={submitResponse}
                 className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600"
               >
                 Submit Response

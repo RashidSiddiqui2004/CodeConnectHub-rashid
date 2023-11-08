@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react'
-import { fireDB } from '../../fireabase/FirebaseConfig';
+import { fireDB } from '../../firebase/FirebaseConfig';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 

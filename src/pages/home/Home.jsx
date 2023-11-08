@@ -7,15 +7,12 @@ import PostCard from '../../components/postCard/PostCard'
 import Track from '../../components/track/Track'
 import { Link } from 'react-router-dom'
 import SignupCard from '../messageCard/MessageInfo'
+import ChallengesPoster from './ChallengesPoster'
+import CreatePostPoster from './CreatePostPoster'
+import AboutUsPage from '../../components/aboutus/AboutUs'
+import Jobs from './Jobs' 
 
 function Home() {
-
-  const context = useContext(myContext)
-  const { mode } = context
-
-  const add = () => {
-    window.location.href = '/addproduct';
-  }
 
   const login = () => {
     window.location.href = '/login';
@@ -27,21 +24,10 @@ function Home() {
     <Layout>
       <HeroSection />
 
-      {user ? <div className="w-96 mx-auto my-20">
-        <button
-          onClick={add}
-          type="button"
-          className={`focus:outline-none ${mode === 'dark'
-            ? 'bg-gray-800 text-white hover:bg-blue-500'
-            : 'bg-green-500 hover:bg-blue-500'
-            } shadow-md border border-transparent rounded-lg text-lg px-5 
-    py-2 mb-2 my-0 w-full transition-transform transform hover:scale-105`}
-        >
-          <div className="flex items-center justify-center">
-            <h2 className="mr-2 text-white">Add Post</h2>
-          </div>
-        </button>
-      </div> : <div className="w-96 mx-auto my-20">
+      <ChallengesPoster/>
+
+      {user ? 
+      <CreatePostPoster/> : <div className="w-96 mx-auto my-20">
 
         <button
           onClick={login}
@@ -52,16 +38,13 @@ function Home() {
             } shadow-md border border-transparent rounded-lg text-lg px-5 
     py-2 mb-2 my-0 w-full transition-transform transform hover:scale-105`}
         >
-
           <div className="flex items-center justify-center">
             <h2 className="mr-2 text-white">Login/Signup To Access Amazing Features</h2>
           </div>
         </button>
       </div>}
 
-
-
-
+  
       <PostCard />
 
       {user ? <div className="flex justify-center -mt-10 mb-4">
@@ -70,9 +53,9 @@ function Home() {
         </Link>
       </div> : ""}
 
-
-
-      <Track />
+      <Jobs/>
+    
+      <Track /> 
     </Layout>
   )
 }

@@ -1,15 +1,16 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import myContext from '../../../context/data/myContext'; 
+import myContext from '../../../context/data/myContext';
 import { MdOutlineProductionQuantityLimits } from 'react-icons/md'
 import { FaUser, FaCartPlus } from 'react-icons/fa';
 import { AiFillShopping, AiFillPlusCircle, AiFillDelete } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 
+
 function DashboardTab() {
     const context = useContext(myContext)
     const { mode, post, edithandle, deletePost, user } = context
- 
+
     let [isOpen, setIsOpen] = useState(false)
 
     function closeModal() {
@@ -20,10 +21,6 @@ function DashboardTab() {
         setIsOpen(true)
     }
 
-    const add = () => {
-        window.location.href = '/addproduct'
-    }
-    
     return (
         <>
             <div className="container mx-auto">
@@ -49,19 +46,20 @@ function DashboardTab() {
                                     </div>
                                 </button>
                             </Tab>
-                        </TabList> 
+                        </TabList>
 
                         <TabPanel>
                             <div className='  px-4 md:px-0 mb-16'>
                                 <h1 className=' text-center mb-5 text-3xl font-semibold underline' style={{ color: mode === 'dark' ? 'white' : '' }}>Product Details</h1>
-                                <div className=" flex justify-end">
-                                    <button
-                                        onClick={add}
-                                        type="button"
-                                        className="focus:outline-none text-white bg-pink-600 shadow-[inset_0_0_10px_rgba(0,0,0,0.6)] border hover:bg-pink-700 outline-0 font-medium rounded-lg text-sm px-5 py-2.5 mb-2" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} > <div className="flex gap-2 items-center">
-                                            Add Post
-                                        </div></button>
-                                </div>
+                                <Link to={'/addproduct'}>
+                                    <div className=" flex justify-end">
+                                        <button 
+                                            type="button"
+                                            className="focus:outline-none text-white bg-pink-600 shadow-[inset_0_0_10px_rgba(0,0,0,0.6)] border hover:bg-pink-700 outline-0 font-medium rounded-lg text-sm px-5 py-2.5 mb-2" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} > <div className="flex gap-2 items-center">
+                                                Add Post
+                                            </div></button>
+                                    </div>
+                                </Link>
                                 <div className="relative overflow-x-auto ">
                                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400  ">
                                         <thead className="text-xs border border-gray-600 text-black uppercase bg-gray-200 shadow-[inset_0_0_8px_rgba(0,0,0,0.6)]" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
@@ -74,7 +72,7 @@ function DashboardTab() {
                                                 </th>
                                                 <th scope="col" className="px-6 py-3">
                                                     Title
-                                                </th> 
+                                                </th>
                                                 <th scope="col" className="px-6 py-3">
                                                     Tags
                                                 </th>
@@ -87,7 +85,7 @@ function DashboardTab() {
                                             </tr>
                                         </thead>
                                         {post.map((item, index) => {
-                                            const { title, imageUrl, date , tags} = item;
+                                            const { title, imageUrl, date, tags } = item;
                                             return (
                                                 <tbody className=''>
                                                     <tr className="bg-gray-50 border-b  dark:border-gray-700" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
@@ -99,7 +97,7 @@ function DashboardTab() {
                                                         </th>
                                                         <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
                                                             {title}
-                                                        </td> 
+                                                        </td>
                                                         <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
                                                             {tags}
                                                         </td>
@@ -136,9 +134,9 @@ function DashboardTab() {
                             </div>
                         </TabPanel>
 
-                    
+
                         <TabPanel>
-                             <div className="relative overflow-x-auto mb-10">
+                            <div className="relative overflow-x-auto mb-10">
                                 <h1 className=' text-center mb-5 text-3xl font-semibold underline' style={{ color: mode === 'dark' ? 'white' : '' }}>User Details</h1>
                                 <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                                     <thead className="text-xs text-black uppercase bg-gray-200 " style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
@@ -153,28 +151,28 @@ function DashboardTab() {
                                             <th scope="col" className="px-6 py-3">
                                                 Email
                                             </th>
-                                         
+
                                         </tr>
                                     </thead>
-                                   {user.map((item,index)=>{
-                                    const {name,email} = item;
-                                    return(
-                                        <tbody>
-                                        <tr className="bg-gray-50 border-b  dark:border-gray-700" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
-                                            <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
-                                               {index + 1}.
-                                            </td>
-                                            <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
-                                                {name}
-                                            </td>
-                                            <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
-                                                {email}
-                                            </td>
-                            
-                                        </tr>
-                                    </tbody>
-                                    )
-                                   })}
+                                    {user.map((item, index) => {
+                                        const { name, email } = item;
+                                        return (
+                                            <tbody>
+                                                <tr className="bg-gray-50 border-b  dark:border-gray-700" style={{ backgroundColor: mode === 'dark' ? 'rgb(46 49 55)' : '', color: mode === 'dark' ? 'white' : '', }} >
+                                                    <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                                        {index + 1}.
+                                                    </td>
+                                                    <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                                        {name}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-black " style={{ color: mode === 'dark' ? 'white' : '' }}>
+                                                        {email}
+                                                    </td>
+
+                                                </tr>
+                                            </tbody>
+                                        )
+                                    })}
                                 </table>
                             </div>
                         </TabPanel>

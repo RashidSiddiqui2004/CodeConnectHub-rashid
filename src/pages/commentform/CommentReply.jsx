@@ -1,11 +1,11 @@
 
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router';
-import { fireDB } from '../../fireabase/FirebaseConfig';
+import { fireDB } from '../../firebase/FirebaseConfig';
 import myContext from '../../context/data/myContext';
 import { doc, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
-import { auth } from '../../fireabase/FirebaseConfig';
+import { auth } from '../../firebase/FirebaseConfig';
 import { collection, query, where, getDocs } from "firebase/firestore";
 
 const CommentReply = () => {

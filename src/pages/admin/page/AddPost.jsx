@@ -2,8 +2,8 @@
 
 import React, { useContext, useState } from 'react'
 import myContext from '../../../context/data/myContext' 
-import { auth } from '../../../fireabase/FirebaseConfig';
-import { fireDB } from '../../../fireabase/FirebaseConfig';
+import { auth } from '../../../firebase/FirebaseConfig';
+import { fireDB } from '../../../firebase/FirebaseConfig';
 import { collection, query, where, getDocs } from "firebase/firestore";
 import MonacoEditor from "react-monaco-editor";
 import "./styles.css"
@@ -172,8 +172,8 @@ function AddPost() {
                     <div className='flex justify-center mb-3'>
                         <button
                             onClick={addPost}
-                            className=' bg-yellow-500 w-full text-black font-bold inputbox px-2 py-2 rounded-lg'>
-                            Post
+                            className='  w-full text-black bg-green-300 hover:bg-blue-400 font-bold inputbox px-2 py-2 rounded-lg'>
+                            Publish Post
                         </button>
                     </div>
 
